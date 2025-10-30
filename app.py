@@ -34,17 +34,18 @@ def process():
         data = request.get_json()
 
         # --- Xác thực đầu vào ---
-        if not data or 'text_input' not in data or 'task_instruction' not in data:
+        if not data or 'text_input' not in data or 'task_instruction' not in data or 'model' not in data:
             # Nếu thiếu dữ liệu, trả về lỗi 400 Bad Request
-            return jsonify({"error": "Đầu vào không hợp lệ. 'text_input' và 'task_instruction' là bắt buộc."}), 400
+            return jsonify({"error": "Đầu vào không hợp lệ. 'text_input', 'task_instruction', và 'model' là bắt buộc."}), 400
 
         user_text = data['text_input']
         instruction = data['task_instruction']
+        model = data['model']
 
         # --- Gọi Service Layer ---
         # Chuyển dữ liệu sang llm_service để xử lý (tách biệt logic)
-        print(f"DEBUG: Nhận yêu cầu: text='{user_text[:20]}...', instruction='{instruction}'")
-        result_text = llm_service.call_gemma(user_text, instruction)
+        print(f"DEBUG: Nhận yêu cầu: text='{user_text[:20]}...', instruction='{instruction}', model='{model}'")
+        result_text = llm_service.call_llm(user_text, instruction, model)
 
         # --- Trả về kết quả ---
         # Trả về kết quả từ LLM dưới dạng JSON

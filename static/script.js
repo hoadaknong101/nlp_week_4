@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const customInstructionInput = document.getElementById("custom-instruction");
   const customTaskButton = document.getElementById("custom-task-btn");
   const taskButtons = document.querySelectorAll(".task-btn"); // Lấy tất cả nút tác vụ
+  const modelSelect = document.getElementById("model-select");
 
   // --- 2. Quản lý Trạng thái (State) ---
   let currentLang = "en"; // Ngôn ngữ mặc định là tiếng Anh
@@ -44,10 +45,11 @@ document.addEventListener("DOMContentLoaded", () => {
       textInputPlaceholder:
         "Type or paste your text here... For code generation, describe the code you want.",
       taskLabel: "Select a Pre-defined Task:",
+      modelLabel: "Select Model:",
       customLabel: "Or, use a Custom Instruction:",
       customPlaceholder:
         "e.g., 'Translate this to Japanese' or 'Check this text for grammar errors'",
-      customButton: "Run Custom",
+      customButton: "Run",
       resultLabel: "Result:",
       errorPrefix: "Error: ",
       emptyInputError:
@@ -60,6 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
       textInputPlaceholder:
         "Nhập hoặc dán văn bản của bạn tại đây... Để tạo code, hãy mô tả code bạn muốn.",
       taskLabel: "Chọn một tác vụ có sẵn:",
+      modelLabel: "Chọn mô hình:",
       customLabel: "Hoặc, dùng chỉ thị tùy chỉnh:",
       customPlaceholder:
         "Ví dụ: 'Dịch sang tiếng Nhật' hoặc 'Kiểm tra lỗi ngữ pháp cho văn bản này'",
@@ -101,6 +104,7 @@ document.addEventListener("DOMContentLoaded", () => {
         body: JSON.stringify({
           text_input: text,
           task_instruction: instruction,
+          model: modelSelect.value,
         }),
       });
 

@@ -31,17 +31,22 @@ safety_settings = [
     {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
 ]
 
-try:
-    model = genai.GenerativeModel(
-        model_name='models/gemma-3-27b-it', # Sử dụng model gemma-latest như yêu cầu
-        generation_config=generation_config,
-        safety_settings=safety_settings
-    )
-except Exception as e:
-    print(f"Lỗi khi khởi tạo model Gemma: {e}")
+def initialize_model(model_name: str):
     model = None
 
-def call_gemma(user_text: str, instruction: str) -> str:
+    try:
+        model = genai.GenerativeModel(
+            model_name=model_name, # Sử dụng model gemini-pro
+            generation_config=generation_config,
+            safety_settings=safety_settings
+        )
+    except Exception as e:
+        print(f"Lỗi khi khởi tạo model Gemini: {e}")
+        model = None
+
+    return model
+
+def call_llm(user_text: str, instruction: str, model_name: str) -> str:
     """
     Hàm này chịu trách nhiệm gọi API Google Gemma.
     
@@ -56,22 +61,20 @@ def call_gemma(user_text: str, instruction: str) -> str:
     Returns:
         Một chuỗi (str) chứa kết quả do AI tạo ra.
     """
-    if model is None:
-        return "Lỗi: Model Gemma chưa được khởi tạo thành công. Vui lòng kiểm tra API Key và cấu hình."
-
+    current_model = initialize_model(model_name)
     # --- Kỹ thuật Prompt Engineering ---
     # Ghép chỉ thị và văn bản người dùng để tạo prompt hoàn chỉnh.
     # Sử dụng dấu phân cách rõ ràng (---) giúp model hiểu rõ
     # đâu là chỉ thị và đâu là dữ liệu cần xử lý.
     prompt = f"{instruction}\n\n---\n\n{user_text}"
 
-    print(f"DEBUG: Đang gửi prompt tới Gemma:\n{prompt}") # Ghi log prompt để debug
+    print(f"DEBUG: Đang gửi prompt tới {model_name}:\n{prompt}") # Ghi log prompt để debug
 
     try:
         # Gọi API để tạo nội dung
-        response = model.generate_content(prompt)
+        response = current_model.generate_content(prompt)
         
-        # Xử lý trường hợp model không trả về gì (ví dụ: bị bộ lọc an toàn chặn)
+        # Xử lý trường hợp current_model không trả về gì (ví dụ: bị bộ lọc an toàn chặn)
         if not response.parts:
              return "Lỗi: Model đã trả về một phản hồi rỗng. Điều này có thể do bộ lọc an toàn hoặc nội dung đầu vào."
         
