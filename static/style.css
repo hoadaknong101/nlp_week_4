@@ -1,0 +1,237 @@
+/* --- Biến toàn cục (CSS Variables) --- */
+:root {
+    --bg-color: #f4f7f6; /* Màu nền sáng, sạch sẽ */
+    --surface-color: #ffffff; /* Màu nền của container */
+    --primary-color: #4285F4; /* Màu xanh của Google */
+    --primary-hover: #357ae8;
+    --text-color: #202124; /* Màu chữ chính (Google's dark gray) */
+    --text-secondary: #5f6368;
+    --border-color: #dfe1e5;
+    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --shadow: 0 4px 6px rgba(32, 33, 36, 0.08);
+    --radius: 12px;
+}
+
+/* --- Cài đặt cơ bản --- */
+body {
+    font-family: var(--font-family);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 20px;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 25px 30px;
+    background-color: var(--surface-color);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+/* --- Header --- */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 15px;
+    margin-bottom: 25px;
+}
+
+header h1 {
+    color: var(--primary-color);
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+
+.lang-btn {
+    background-color: var(--surface-color);
+    color: var(--primary-color);
+    border: 2px solid var(--primary-color);
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.lang-btn:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* --- Nhãn (Labels) và Đầu vào (Inputs) --- */
+.main-label {
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--text-color);
+    margin-bottom: 10px;
+    display: block;
+}
+
+textarea, input[type="text"] {
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 20px;
+    background-color: #f8f9fa;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-color);
+    font-family: var(--font-family);
+    font-size: 1rem;
+    box-sizing: border-box; /* Quan trọng để padding không làm vỡ layout */
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+textarea:focus, input[type="text"]:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.2);
+}
+
+/* --- Lưới Nút bấm Tác vụ --- */
+.button-grid {
+    display: grid;
+    /* Tạo lưới responsive: tự động điều chỉnh số cột */
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.task-btn {
+    padding: 12px 15px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--primary-color);
+    background-color: transparent;
+    border: 2px solid var(--primary-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.task-btn:hover {
+    background-color: var(--primary-color);
+    color: white;
+    transform: translateY(-2px); /* Hiệu ứng nhấc lên */
+    box-shadow: 0 4px 8px rgba(66, 133, 244, 0.2);
+}
+
+/* --- Khu vực Tác vụ Tùy chỉnh --- */
+.custom-task-section {
+    display: flex;
+    gap: 10px;
+    align-items: stretch; /* Đảm bảo input và button cao bằng nhau */
+}
+
+.custom-task-section input[type="text"] {
+    flex-grow: 1; /* Input chiếm phần lớn không gian */
+    margin-bottom: 0;
+}
+
+#custom-task-btn {
+    flex-shrink: 0; /* Button không bị co lại */
+    padding: 0 25px;
+    font-size: 1rem;
+    font-weight: 700;
+    background-color: var(--primary-hover);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+#custom-task-btn:hover {
+    background-color: var(--primary-color);
+}
+
+/* --- Khu vực Kết quả (Output) --- */
+.output-section {
+    margin-top: 30px;
+}
+
+/* Khu vực hiển thị kết quả (giữ định dạng) */
+#result-display {
+    background-color: #202124; /* Nền tối cho kết quả code/text */
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px 20px;
+    min-height: 150px;
+    color: #e8eaed; /* Chữ màu sáng */
+    overflow-x: auto; /* Cho phép cuộn ngang nếu code quá dài */
+}
+
+/* Sử dụng <pre><code> để giữ khoảng trắng và định dạng code */
+#result-display pre {
+    margin: 0;
+    white-space: pre-wrap;   /* Tự động xuống hàng */
+    word-wrap: break-word; /* Bẻ gãy từ nếu quá dài */
+}
+
+#result-display code {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.95rem;
+}
+
+/* --- Spinner (Hiệu ứng tải) --- */
+.spinner-container {
+    display: flex; /* Mặc định là 'none', JS sẽ đổi thành 'flex' */
+    justify-content: center;
+    align-items: center;
+    padding: 50px 0;
+}
+
+.spinner {
+    border: 5px solid var(--border-color);
+    border-top: 5px solid var(--primary-color); /* Màu chính của spinner */
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
+/* Animation cho spinner */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* --- Footer --- */
+footer {
+    text-align: center;
+    margin-top: 30px;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+/* --- Responsive (Tương thích di động) --- */
+@media (max-width: 700px) {
+    body {
+        padding: 10px;
+    }
+    .container {
+        padding: 20px 15px;
+    }
+    header {
+        flex-direction: column; /* Xếp chồng tiêu đề và nút */
+        gap: 15px;
+        align-items: flex-start;
+    }
+    .button-grid {
+        /* 1 cột trên di động */
+        grid-template-columns: 1fr; 
+    }
+    .custom-task-section {
+        flex-direction: column; /* Xếp chồng input và button tùy chỉnh */
+    }
+    #custom-task-btn {
+        padding: 14px; /* Làm button to hơn trên di động */
+    }
+}
