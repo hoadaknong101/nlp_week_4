@@ -1,99 +1,283 @@
 <!DOCTYPE html>
 <html lang="en" class="bg-gray-50">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Multi-Purpose LLM Tool (Gemma)</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link
+      rel="shortcut icon"
+      href="/static/assets/Artwork.png"
+      type="image/x-icon"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        #result-display pre {
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      #result-display pre {
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
     </style>
-</head>
-<body class="text-gray-800">
-    <div class="fixed w-[250px] top-2 left-2 p-4 bg-white bg-opacity-90 shadow-lg rounded-br-xl z-50 border-2 border-indigo-500">
-        <p class="text-lg font-semibold text-gray-700 mb-1">Nhóm 3 - Group C</p>
-        <ol class="text-lg text-gray-600">
-            <li>1. Trần Thị Minh Ánh</li>
-            <li>2. Phạm Đinh Quốc Hoà</li>
-            <li>3. Nguyễn Phương Thịnh</li>
-            <li>4. Hà Quốc Toàn</li>
-        </ol>
+  </head>
+  <body class="text-gray-800">
+    <div
+      class="static m-2 md:w-[250px] md:fixed p-4 bg-white bg-opacity-90 shadow-lg rounded-md z-50 border-2 border-indigo-500"
+    >
+      <p class="text-lg font-semibold text-gray-700 mb-1">Nhóm 3 - Group C</p>
+      <ol class="text-lg text-gray-600">
+        <li>1. Trần Thị Minh Ánh</li>
+        <li>2. Phạm Đinh Quốc Hoà</li>
+        <li>3. Nguyễn Phương Thịnh</li>
+        <li>4. Hà Quốc Toàn</li>
+      </ol>
+      <hr class="my-3" />
+      <div id="sidebar" class="w-full">
+        <h4 id="history-list-title" class="text-lg font-bold mb-2">
+          Prompt History
+        </h4>
+
+        <div id="history-list" class="text-sm">
+          <p class="text-gray-500">Đang tải...</p>
+        </div>
+      </div>
     </div>
+
     <div class="container mx-auto max-w-4xl px-4 py-8">
-        <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-6 border-b border-gray-200 mb-4">
-            <h1 class="text-3xl font-bold text-gray-900">Multi-Purpose LLM Tool</h1>
-            <button id="lang-toggle" class="mt-4 sm:mt-0 text-sm font-medium text-indigo-600 hover:text-indigo-500">Tiếng Việt</button>
-        </header>
-        
-        <main class="space-y-2">
-            <div class="input-section">
-                <div class="flex items-center justify-between mb-3">
-                    <label for="text-input" class="block text-lg font-medium text-gray-700 mb-2" data-en="Text input" data-vi="Nội dung">Text input</label>
-                    <select id="model-select" class="p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                        <option value="models/gemma-3-4b-it">Gemma 3 4B</option>
-                        <option value="models/gemma-3-12b-it">Gemma 3 12B</option>
-                        <option value="models/gemma-3-27b-it">Gemma 3 27B</option>
-                        <option value="models/gemini-flash-lite-latest">Gemini Flash Lite Latest</option>
-                        <option value="models/gemini-flash-latest">Gemini Flash Latest</option>
-                        <option value="models/gemini-2.5-flash">Gemini 2.5 Flash</option>
-                        <option value="models/gemini-2.5-pro">Gemini 2.5 Pro</option>
-                    </select>
-                </div>
-                <textarea id="text-input" rows="8" class="w-full p-4 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-                          placeholder-en="Type or paste your text here... For code generation, describe the code you want." 
-                          placeholder-vi="Nhập hoặc dán văn bản của bạn tại đây... Để tạo code, hãy mô tả code bạn muốn."></textarea>
-            </div>
-            <div class="controls-section">
-                <div class="flex items-center justify-between mb-3">
-                    <h3 class="text-lg font-medium text-gray-700" data-en="Select a pre-defined task" data-vi="Chọn một tác vụ có sẵn">Select a pre-defined task</h3>
-                </div>
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 text-sm">
-                    <button class="task-btn w-full text-left px-4 py-3 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-100 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition" data-en="Summarize" data-vi="Tóm tắt">Summarize</button>
-                    <button class="task-btn w-full text-left px-4 py-3 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-100 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition" data-en="Translate to French" data-vi="Dịch sang tiếng Pháp">Translate to French</button>
-                    <button class="task-btn w-full text-left px-4 py-3 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-100 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition" data-en="Explain Like I'm 5" data-vi="Giải thích như 5 tuổi">Explain Like I'm 5</button>
-                    <button class="task-btn w-full text-left px-4 py-3 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-100 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition" data-en="Extract Keywords" data-vi="Trích xuất Từ khóa">Extract Keywords</button>
-                    <button class="task-btn w-full text-left px-4 py-3 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-100 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition" data-en="Generate Python Code" data-vi="Tạo Code Python">Generate Python Code</button>
-                    <button class="task-btn w-full text-left px-4 py-3 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-100 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition" data-en="Analyze Sentiment" data-vi="Phân tích Cảm xúc">Analyze Sentiment</button>
-                    <button class="task-btn w-full text-left px-4 py-3 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-100 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition" data-en="Format as JSON" data-vi="Định dạng thành JSON">Format as JSON</button>
-                    <button class="task-btn w-full text-left px-4 py-3 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-100 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition" data-en="Find 5 Related Questions" data-vi="Tìm 5 câu hỏi liên quan">Find 5 Related Questions</button>
-                </div>
-            </div>
+      <header
+        class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-6 border-b border-gray-200 mb-4"
+      >
+        <h1 class="text-3xl font-bold text-gray-900">Multi-Purpose LLM Tool</h1>
+        <button
+          id="lang-toggle"
+          class="mt-4 sm:mt-0 text-sm font-medium text-indigo-600 hover:text-indigo-500"
+        >
+          Tiếng Việt
+        </button>
+      </header>
 
-            <div class="custom-task-section">
-                <label for="custom-instruction" class="block text-lg font-medium text-gray-700 mb-2" data-en="Or, use a custom instruction" data-vi="Hoặc, dùng chỉ thị tùy chỉnh">Or, use a custom instruction:</label>
-                <div class="flex items-center space-x-3">
-                    <input type="text" id="custom-instruction" class="flex-grow w-full p-4 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-                           placeholder-en="e.g., 'Translate this to Japanese' or 'Check this text for grammar errors'" 
-                           placeholder-vi="Ví dụ: 'Dịch sang tiếng Nhật' hoặc 'Kiểm tra lỗi ngữ pháp cho văn bản này'">
-                    <button id="custom-task-btn" class="px-6 py-4 font-bold text-white bg-indigo-600 rounded-lg shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors" data-en="Run" data-vi="Chạy">Run</button>
-                </div>
-            </div>
+      <main class="space-y-2">
+        <section class="input-section">
+          <div class="flex items-center justify-between mb-3">
+            <label
+              for="text-input"
+              class="block text-lg font-medium text-gray-700 my-auto"
+              data-en="Text input"
+              data-vi="Nội dung"
+              >Text input</label
+            >
 
-            <div class="output-section">
-                <h3 class="text-lg font-medium text-gray-700 mb-2" data-en="Result" data-vi="Kết quả">Result</h3>
-                
-                <div id="loading-spinner" class="flex justify-center items-center py-10" style="display: none;">
-                    <div class="spinner w-10 h-10 border-4 border-gray-200 border-t-indigo-600 rounded-full animate-spin"></div>
-                </div>
-                
-                <div id="result-display" class="p-5 bg-gray-900 text-gray-100 rounded-lg shadow-inner min-h-[150px] overflow-x-auto">
-                    <pre><code class="font-mono text-sm"></code></pre>
-                </div>
-            </div>
-        </main>
+            <div class="flex gap-2">
+              <select
+                id="model-select"
+                title="Choose model"
+                class="p-2 border border-gray-300 rounded-md shadow-sm hover:bg-gray-100 hover:border-gray-400 focus:outline-none cursor-pointer transition"
+              >
+                <option value="models/gemma-3-4b-it">Gemma 3 4B</option>
+                <option value="models/gemma-3-12b-it">Gemma 3 12B</option>
+                <option value="models/gemma-3-27b-it">Gemma 3 27B</option>
+                <option value="models/gemini-flash-lite-latest">Gemini Flash Lite Latest</option>
+                <option value="models/gemini-flash-latest">Gemini Flash Latest</option>
+                <option value="models/gemini-2.5-flash">Gemini 2.5 Flash</option>
+                <option value="models/gemini-2.5-pro">Gemini 2.5 Pro</option>
+              </select>
 
-        <footer class="text-center mt-12 text-sm text-gray-500 flex items-start gap-2 justify-center">
-            <p> &copy; 2025 Multi-Purpose LLM Tool | Được thực bởi nhóm 3 (Group C)</p>
-        </footer>
+              <button
+                id="openDialog"
+                class="px-4 py-2 text-white bg-indigo-600 rounded-lg shadow-sm hover:bg-indigo-700 focus:outline-none"
+              >
+                &#63;
+              </button>
+            </div>
+          </div>
+          <textarea
+            id="text-input"
+            rows="8"
+            style="min-height: 200px"
+            class="w-full p-4 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline focus:ring-indigo-500 focus:border-indigo-500 transition"
+            placeholder-en="Type or paste your text here... For code generation, describe the code you want."
+            placeholder-vi="Nhập hoặc dán văn bản của bạn tại đây... Để tạo code, hãy mô tả code bạn muốn."
+          ></textarea>
+        </section>
+
+        <section class="controls-section">
+          <div class="flex items-center justify-between mb-3">
+            <h3
+              class="text-lg font-medium text-gray-700"
+              data-en="Select a pre-defined task"
+              data-vi="Chọn một tác vụ có sẵn"
+            >
+              Select a pre-defined task
+            </h3>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 text-sm">
+            <button
+              type="button"
+              class="task-btn w-full text-left px-4 py-3 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-100 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition"
+              data-en="Summarize"
+              data-vi="Tóm tắt"
+            >
+              Summarize
+            </button>
+            <button
+              type="button"
+              class="task-btn w-full text-left px-4 py-3 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-100 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition"
+              data-en="Translate to French"
+              data-vi="Dịch sang tiếng Pháp"
+            >
+              Translate to French
+            </button>
+            <button
+              type="button"
+              class="task-btn w-full text-left px-4 py-3 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-100 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition"
+              data-en="Explain Like I'm 5"
+              data-vi="Giải thích như 5 tuổi"
+            >
+              Explain Like I'm 5
+            </button>
+            <button
+              type="button"
+              class="task-btn w-full text-left px-4 py-3 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-100 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition"
+              data-en="Extract Keywords"
+              data-vi="Trích xuất Từ khóa"
+            >
+              Extract Keywords
+            </button>
+            <button
+              type="button"
+              class="task-btn w-full text-left px-4 py-3 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-100 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition"
+              data-en="Generate Python Code"
+              data-vi="Tạo Code Python"
+            >
+              Generate Python Code
+            </button>
+            <button
+              type="button"
+              class="task-btn w-full text-left px-4 py-3 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-100 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition"
+              data-en="Analyze Sentiment"
+              data-vi="Phân tích Cảm xúc"
+            >
+              Analyze Sentiment
+            </button>
+            <button
+              type="button"
+              class="task-btn w-full text-left px-4 py-3 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-100 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition"
+              data-en="Format as JSON"
+              data-vi="Định dạng thành JSON"
+            >
+              Format as JSON
+            </button>
+            <button
+              type="button"
+              class="task-btn w-full text-left px-4 py-3 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-100 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition"
+              data-en="Find 5 Related Questions"
+              data-vi="Tìm 5 câu hỏi liên quan"
+            >
+              Find 5 Related Questions
+            </button>
+          </div>
+        </section>
+
+        <section class="custom-task-section">
+          <label
+            for="custom-instruction"
+            class="block text-lg font-medium text-gray-700 mb-2"
+            data-en="Or, use a custom instruction"
+            data-vi="Hoặc, dùng chỉ thị tùy chỉnh"
+            >Or, use a custom instruction:</label
+          >
+          <div class="flex flex-wrap md:flex-nowrap items-center">
+            <input
+              type="text"
+              id="custom-instruction"
+              class="flex-grow w-full p-4 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline focus:ring-indigo-500 focus:border-indigo-500 transition"
+              placeholder-en="e.g., 'Translate this to Japanese' or 'Check this text for grammar errors'"
+              placeholder-vi="Ví dụ: 'Dịch sang tiếng Nhật' hoặc 'Kiểm tra lỗi ngữ pháp cho văn bản này'"
+            />
+            <button
+              id="custom-task-btn"
+              type="button"
+              class="py-4 mt-2 ml-0 w-full md:mt-0 md:ml-2 md:w-[210px] font-bold text-white bg-indigo-600 rounded-lg shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+              data-en="Run"
+              data-vi="Chạy"
+            >
+              Run
+            </button>
+          </div>
+        </section>
+
+        <section class="output-section">
+          <h3
+            class="text-lg font-medium text-gray-700 mb-2"
+            data-en="Result"
+            data-vi="Kết quả"
+          >
+            Result
+          </h3>
+
+          <div
+            id="loading-spinner"
+            class="flex justify-center items-center py-10"
+            style="display: none"
+          >
+            <div
+              class="spinner w-10 h-10 border-4 border-gray-200 border-t-indigo-600 rounded-full animate-spin"
+            ></div>
+          </div>
+
+          <div
+            id="result-display"
+            class="p-5 bg-gray-900 text-gray-100 rounded-lg shadow-inner min-h-[150px] overflow-x-auto"
+          >
+            <pre><code class="font-mono text-sm"></code></pre>
+          </div>
+        </section>
+      </main>
+
+      <footer class="text-center mt-12 text-sm text-gray-500 flex items-start gap-2 justify-center">
+        <p>&copy; 2025 Multi-Purpose LLM Tool | Được thực bởi nhóm 3 (Group C)</p>
+      </footer>
+
+      <div
+        id="dialog-wrapper"
+        class="fixed w-full inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden"
+      >
+        <div class="bg-white rounded-lg shadow-xl p-6 relative">
+          <button
+            id="closeDialog"
+            class="absolute top-4 right-5 text-gray-500 hover:bg-gray-200 text-2xl px-3 rounded-md"
+          >
+            &times;
+          </button>
+          <div id="model-table-container"></div>
+        </div>
+      </div>
     </div>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
-</body>
+    <script>
+      const openBtn = document.getElementById("openDialog");
+      const closeBtn = document.getElementById("closeDialog");
+      const dialogWrapper = document.getElementById("dialog-wrapper");
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          dialogWrapper.classList.add("hidden");
+          e.preventDefault();
+        }
+      });
+
+      openBtn.addEventListener("click", () => {
+        dialogWrapper.classList.remove("hidden");
+      });
+
+      closeBtn.addEventListener("click", () => {
+        dialogWrapper.classList.add("hidden");
+      });
+    </script>
+  </body>
 </html>

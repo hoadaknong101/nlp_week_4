@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const customTaskButton = document.getElementById("custom-task-btn");
   const taskButtons = document.querySelectorAll(".task-btn"); // Lấy tất cả nút tác vụ
   const modelSelect = document.getElementById("model-select");
+  const historyListTitle = document.getElementById("history-list-title");
 
   // --- 2. Quản lý Trạng thái (State) ---
   let currentLang = "en"; // Ngôn ngữ mặc định là tiếng Anh
@@ -55,6 +56,8 @@ document.addEventListener("DOMContentLoaded", () => {
       emptyInputError:
         "Please enter some text in the input area before submitting.",
       emptyCustomInstructionError: "Please enter a custom instruction.",
+      customSelectTitle: "Choose model",
+      customHistoryListTitle: "Chat History",
     },
     vi: {
       toggleLang: "English",
@@ -71,6 +74,8 @@ document.addEventListener("DOMContentLoaded", () => {
       errorPrefix: "Lỗi: ",
       emptyInputError: "Vui lòng nhập nội dung vào ô văn bản trước khi gửi.",
       emptyCustomInstructionError: "Vui lòng nhập chỉ thị tùy chỉnh.",
+      customSelectTitle: "Chọn mô hình",
+      customHistoryListTitle: "Lịch Sử Trò Chuyện",
     },
   };
 
@@ -125,6 +130,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // --- Cập nhật UI: Hiển thị kết quả ---
       resultDisplayCode.textContent = data.result;
+      loadHistory();
     } catch (error) {
       // --- Cập nhật UI: Xử lý lỗi (ví dụ: mạng, server) ---
       loadingSpinner.style.display = "none";
@@ -156,6 +162,12 @@ document.addEventListener("DOMContentLoaded", () => {
     // Cập nhật các placeholder (không dùng data-vi/data-en được)
     textInput.placeholder = langData.textInputPlaceholder;
     customInstructionInput.placeholder = langData.customPlaceholder;
+
+    // Cập nhật tiêu đề của model select
+    modelSelect.title = langData.customSelectTitle;
+    historyListTitle.textContent = langData.customHistoryListTitle;
+
+    loadModelTable(currentLang);
   }
 
   // --- 4. Gắn các Trình nghe Sự kiện (Event Listeners) ---
@@ -201,4 +213,90 @@ document.addEventListener("DOMContentLoaded", () => {
   // Chúng ta sẽ gọi nó một lần để đảm bảo các placeholder được đặt đúng.
   toggleLanguage(); // Đổi sang 'vi'
   toggleLanguage(); // Đổi lại 'en' (để thiết lập trạng thái ban đầu)
+  loadHistory();
 });
+
+function loadModelTable(currentLang) {
+  const container = document.getElementById("model-table-container");
+  if (!container) return; // Thoát nếu không tìm thấy container
+
+  // Đường dẫn tương đối:
+  // Nếu cả index.html và model-table.html cùng cấp (trong templates/),
+  // thì đường dẫn là tên file.
+  const apiUrl = "/api/model-table/" + currentLang;
+
+  fetch(apiUrl)
+    .then((response) => {
+      if (!response.ok) {
+        // Lỗi này giờ là lỗi của Flask route
+        throw new Error(
+          `Failed to load model table from Flask endpoint: ${response.status}`
+        );
+      }
+      return response.text();
+    })
+    .then((html) => {
+      container.innerHTML = html;
+    })
+    .catch((error) => {
+      console.error("Lỗi khi tải bảng mô hình:", error);
+      container.innerHTML = `<p style="color: red;">Lỗi tải dữ liệu: Vui lòng kiểm tra endpoint ${apiUrl}.</p>`;
+    });
+}
+
+function renderHistory(history) {
+  const historyList = document.getElementById("history-list");
+  if (!historyList) return;
+
+  historyList.innerHTML = ""; // Xóa nội dung cũ
+
+  if (history.length === 0) {
+    historyList.innerHTML =
+      '<p class="text-gray-500">Chưa có tương tác nào.</p>';
+    return;
+  }
+
+  history.forEach((item) => {
+    const itemDiv = document.createElement("div");
+    itemDiv.className =
+      "truncate p-2 rounded-md hover:bg-gray-200 cursor-pointer";
+    itemDiv.title = item.prompt; // Tooltip đầy đủ prompt
+    itemDiv.textContent = item.summary;
+    itemDiv.dataset.prompt = item.prompt; // Lưu prompt để tái sử dụng
+
+    // Sự kiện click: Tải prompt vào ô nhập liệu
+    itemDiv.addEventListener("click", () => {
+      const textInput = document.getElementById("text-input"); // Thay bằng ID ô nhập liệu chính
+      if (textInput) {
+        textInput.value = item.prompt;
+        // Có thể cuộn lên đầu trang hoặc focus vào ô nhập liệu
+        textInput.focus();
+      }
+      const resultDisplayCode = document
+        .getElementById("result-display")
+        .querySelector("code");
+      if (resultDisplayCode) {
+        resultDisplayCode.textContent = item.result;
+      }
+    });
+
+    historyList.appendChild(itemDiv);
+  });
+}
+
+function loadHistory() {
+  fetch("/api/history") // Gọi route Flask
+    .then((response) => {
+      if (!response.ok) throw new Error("Không thể tải lịch sử.");
+      return response.json();
+    })
+    .then((data) => {
+      renderHistory(data);
+    })
+    .catch((error) => {
+      console.error("Lỗi tải lịch sử:", error);
+      const historyList = document.getElementById("history-list");
+      if (historyList)
+        historyList.innerHTML = '<p class="text-red-500 text-xs">Lỗi tải.</p>';
+    });
+}
